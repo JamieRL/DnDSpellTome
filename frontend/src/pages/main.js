@@ -6,12 +6,12 @@ import {
 } from "react-router-dom"
 import styled from 'styled-components'
 
-import SpellList from '../components/SpellList'
+import SpellSearch from '../components/SpellSearch'
 
 
 const DND_API_URL = 'http://www.dnd5eapi.co/api/'
 
-const OPTIONS = [{'name': 'Spells', 'url': 'spells'}, {'name': 'Features/Traits', 'url': 'features'}]
+const OPTIONS = [{'name': 'Spells', 'url': 'spells'}, {'name': 'My Spells', 'url': 'spells'}]
 
 const SearchBox = styled.input`
   text-align:center;
@@ -115,6 +115,18 @@ class MainPage extends React.Component {
     this.setState({'tab': index})
   }
 
+  renderSearch() {
+    return (
+      <>
+        <form onSubmit={e => e.preventDefault()}>
+          <SearchBox type='text' value={this.state.query} onChange={e => this.updateQuery(e)}/><br/>
+          <button onClick={() => this.fetchData()}>Search</button>
+        </form>
+        <SpellSearch spell={this.state.data}/>
+      </>
+    )
+  }
+
   renderMainPage() {
     const tabs = OPTIONS.map((option, index) => {
       if(index === this.state.tab) {
@@ -131,11 +143,8 @@ class MainPage extends React.Component {
       <Main>
         <div>Main Page</div>
         <TabList>{tabs}</TabList><br/>
-        <form onSubmit={e => e.preventDefault()}>
-          <SearchBox type='text' value={this.state.query} onChange={e => this.updateQuery(e)}/><br/>
-          <button onClick={() => this.fetchData()}>Search</button>
-        </form>
-        <SpellList spell={this.state.data}/>
+        {this.state.tab === 0 ? this.renderSearch() : null}
+
       </Main>
     )
   }
