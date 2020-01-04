@@ -6,12 +6,21 @@ import {
 } from "react-router-dom"
 import styled from 'styled-components'
 
-const OPTIONS = ['Spells', 'Traits']
+import SpellList from '../components/SpellList'
+
+
+const DND_API_URL = 'http://www.dnd5eapi.co/api/'
+
+const OPTIONS = [{'name': 'Spells', 'url': 'spells'}, {'name': 'Features/Traits', 'url': 'features'}]
 
 const SearchBox = styled.input`
   text-align:center;
 `
-
+const Main = styled.div`
+  button {
+    margin-top: 1rem;
+  }
+`
 const TabList = styled.ul`
   list-style-type:none;
   display: inline;
@@ -44,7 +53,8 @@ class MainPage extends React.Component {
     this.state = {
       loggedIn: username ? true : false,
       query: '',
-      tab: 0
+      tab: 0,
+      favourites: {}
     }
   }
 
@@ -57,7 +67,38 @@ class MainPage extends React.Component {
           'Content-Type': 'application/json'
         }
       })
+      .then(json => {
+        this.setState({'favourites': json.favourites})
+      })
     }
+  }
+
+  capitalizeWords(words) {
+    let capitalizedWords = []
+    words.forEach(word => {
+      capitalizedWords.push(word.charAt().toLowerCase()+word.slice(1))
+    })
+    return capitalizedWords
+  }
+
+  buildRoute(type) {
+    let query = this.capitalizeWords(this.state.query.split(' ')).join('-')
+    console.log('querry', query)
+    return DND_API_URL+type+'/'+query
+  }
+
+  fetchData() {
+    fetch(this.buildRoute(OPTIONS[this.state.tab].url),{
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin':'*'
+      }
+    })
+    .then(response => {
+      response.json()
+      .then(json => response.ok ? this.setState({ data: json}) : Promise.reject(json))
+    })
   }
 
   renderRedirect() {
@@ -69,8 +110,8 @@ class MainPage extends React.Component {
   updateQuery(e) {
     this.setState({'query': e.target.value})
   }
+
   changeTab(index) {
-    console.log('index is', index)
     this.setState({'tab': index})
   }
 
@@ -78,24 +119,28 @@ class MainPage extends React.Component {
     const tabs = OPTIONS.map((option, index) => {
       if(index === this.state.tab) {
         return (
-          <TabSelected key={index} onClick={() => this.changeTab(index)}>{option}</TabSelected>
+          <TabSelected key={index} onClick={() => this.changeTab(index)}>{option.name}</TabSelected>
         )
       }
       return (
-        <Tab key={index} onClick={() => this.changeTab(index)}>{option}</Tab>
+        <Tab key={index} onClick={() => this.changeTab(index)}>{option.name}</Tab>
       )
     })
 
     return (
-      <>
+      <Main>
         <div>Main Page</div>
         <TabList>{tabs}</TabList><br/>
-        <SearchBox type='text' value={this.state.query} onChange={e => this.updateQuery(e)}/>
-      </>
+        <form onSubmit={e => e.preventDefault()}>
+          <SearchBox type='text' value={this.state.query} onChange={e => this.updateQuery(e)}/><br/>
+          <button onClick={() => this.fetchData()}>Search</button>
+        </form>
+        <SpellList spell={this.state.data}/>
+      </Main>
     )
   }
   render() {
-    console.log('state', this.state)
+    console.log(this.state)
     return (
       <div>
         {this.state.loggedIn ? this.renderMainPage() : this.renderRedirect()}

@@ -13,6 +13,7 @@ function App() {
   height: 100vh;
   text-align:center;
   font-size: 1rem;
+  letter-spacing: 0.5px;
   `
   const Header = styled.h1`
   color: #e62212;
