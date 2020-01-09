@@ -6,7 +6,7 @@ import {
 } from "react-router-dom"
 import styled from 'styled-components'
 
-import SpellSearch from '../components/SpellSearch'
+import SpellInfo from '../components/SpellInfo'
 
 
 const DND_API_URL = 'http://www.dnd5eapi.co/api/'
@@ -54,7 +54,8 @@ class MainPage extends React.Component {
       loggedIn: username ? true : false,
       query: '',
       tab: 0,
-      favourites: {}
+      favourites: {},
+      spells: []
     }
   }
 
@@ -97,7 +98,7 @@ class MainPage extends React.Component {
     })
     .then(response => {
       response.json()
-      .then(json => response.ok ? this.setState({ data: json}) : Promise.reject(json))
+      .then(json => response.ok ? this.setState({ spells: [json]}) : Promise.reject(json))
     })
   }
 
@@ -122,7 +123,6 @@ class MainPage extends React.Component {
           <SearchBox type='text' value={this.state.query} onChange={e => this.updateQuery(e)}/><br/>
           <button onClick={() => this.fetchData()}>Search</button>
         </form>
-        <SpellSearch spell={this.state.data}/>
       </>
     )
   }
@@ -139,12 +139,18 @@ class MainPage extends React.Component {
       )
     })
 
+    const spells = this.state.spells.map(spell => {
+      return (
+        <SpellInfo spell={spell}/>
+      )
+    })
+
     return (
       <Main>
         <div>Main Page</div>
         <TabList>{tabs}</TabList><br/>
         {this.state.tab === 0 ? this.renderSearch() : null}
-
+        {spells}
       </Main>
     )
   }

@@ -7,7 +7,7 @@ const Spell = styled.div`
   width: 80vw;
 `
 const FavouriteToggle = styled.p`
-  width: 15vw;
+
   float: right;
   color: #e62212;
   border: 1px solid #e62212;
@@ -18,7 +18,7 @@ const FavouriteToggle = styled.p`
 `
 
 const FavouriteToggled = styled.p`
-  width: 15vw;
+
   float: right;
   color: black;
   background-color: #e62212;
@@ -33,22 +33,27 @@ const Top = styled.div`
   width: 80vw;
   height: 2rem;
   margin-bottom: 2rem;
-  p {
-    width: 20vw;
+  h3 {
+    width: 30vw;
     float: left;
   }
 `
 
-class SpellList extends React.Component {
+class SpellInfo extends React.Component {
 
-  renderSpell() {
-    console.log(this.props.spell)
-    const components = this.props.spell ? this.props.spell.components.map(component => component) : null
+  render() {
+    const favouriteUntoggled = (
+      <FavouriteToggle>Favourite</FavouriteToggle>
+    )
+    const favouriteToggled = (
+      <FavouriteToggled>Favourite</FavouriteToggled>
+    )
+    const components = this.props.spell.components.map(component => component)
     return (
       <Spell>
         <Top>
-          <p>{'Name: '+this.props.spell.name}</p>
-          <FavouriteToggle>Favourite</FavouriteToggle>
+          <h3>{this.props.spell.name}</h3>
+          {this.props.isFavourite ? favouriteToggled : favouriteUntoggled }
         </Top>
 
         <p>{'Casting Time: '+this.props.spell.casting_time}</p>
@@ -57,13 +62,9 @@ class SpellList extends React.Component {
       </Spell>
     )
   }
-  render() {
-    return (
-      <>
-        {this.props.spell ? this.renderSpell() : null}
-      </>
-    )
-  }
 }
 
-export default SpellList
+SpellInfo.defaultProps = {
+  isFavourite: false
+}
+export default SpellInfo
