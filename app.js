@@ -6,6 +6,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');
+var registrationRouter = require('./routes/register');
 const mongoose = require('mongoose');
 
 var app = express();
@@ -26,11 +27,12 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser('CNMEjlwzFZOoEynNekFyhQ=='));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/login', loginRouter);
+app.use('/register', registrationRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

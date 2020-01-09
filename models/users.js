@@ -36,6 +36,8 @@ userSchema.methods.generateHash = function(password) {
 };
 
 userSchema.methods.validPassword = function(password) {
+  console.log('password entered', password);
+  console.log('password stored', this.password);
   return bcrypt.compareSync(password, this.password);
 };
 
