@@ -12,6 +12,7 @@ router.use(bodyParser.json());
 
 router.route('/register')
 .post((req, res, next) => {
+  res.setHeader('Content-Type', 'application/json');
   if(req.body.password !== req.body.confirmPassword) {
     err = new Error('Passwords do not match');
     err.status = 400;
@@ -30,7 +31,9 @@ router.route('/register')
       var token = jwt.sign({ id: user._id }, process.env.SECRET, {
         expiresIn: 86400 // expires in 24 hours
       });
-      res.status(200).send({ auth: true, token: token });
+      // res.status(200).json({ auth: true, token: token });
+      res.statusCode = 200;
+      res.json({auth: true, token: token});
     });
   }
 });
