@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const bcrypt = require('bcrypt-nodejs');
 
 const favouriteSchema = new Schema({
   id: {
@@ -20,11 +21,26 @@ const userSchema = new Schema({
     required: true,
     unique: true
   },
+  password: {
+    type: String,
+    require: true
+  },
   favourites: [favouriteSchema]
 },{
   timestamps: true
 });
 
+// hash the password
+userSchema.methods.generateHash = function(password) {
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+};
+
+userSchema.methods.validPassword = function(password) {
+  console.log('password entered', password);
+  console.log('password stored', this.password);
+  return bcrypt.compareSync(password, this.password);
+};
+
 var Users = mongoose.model('User', userSchema);
 
-module.exports = users
+module.exports = Users
