@@ -39,6 +39,12 @@ const Top = styled.div`
   }
 `
 
+const FIELDS = [{label: 'Name', value:'name' }, {label:'Description', value: 'desc'}, {label:'Higher Level', value: 'higher_level'},
+                {label:'Range', value: 'range'}, {label:'Components', value: 'components'}, {label:'Materials', value: 'material'},
+                {label:'Ritual', value: 'ritual'}, {label:'Duration', value:'duration'}, {label:'Concentration', value: 'concentration'},
+                {label:'Casting Time', value: 'casting_time'}, {label:'Level', value: 'level'}, {label: 'School', value: 'school'},
+                {label:'Classes', value: 'dnd_class'}]
+
 class SpellInfo extends React.Component {
 
   render() {
@@ -48,7 +54,11 @@ class SpellInfo extends React.Component {
     const favouriteToggled = (
       <FavouriteToggled>Favourite</FavouriteToggled>
     )
-    const components = this.props.spell.components.map(component => component)
+    console.log(this.props.spell)
+    const fields = FIELDS.map((field, index) => {
+      console.log('field', field.value)
+      return <p key={index}>{field.label+': '+this.props.spell[field.value]}</p>
+    })
     return (
       <Spell>
         <Top>
@@ -56,9 +66,7 @@ class SpellInfo extends React.Component {
           {this.props.isFavourite ? favouriteToggled : favouriteUntoggled }
         </Top>
 
-        <p>{'Casting Time: '+this.props.spell.casting_time}</p>
-        <p>{'Description: '+this.props.spell.desc}</p>
-        <p>{'Components: '+components}</p>
+        {fields}
       </Spell>
     )
   }

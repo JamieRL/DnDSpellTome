@@ -9,7 +9,7 @@ import styled from 'styled-components'
 import SpellInfo from '../components/SpellInfo'
 
 
-const DND_API_URL = 'http://www.dnd5eapi.co/api/'
+const DND_API_URL = 'https://api.open5e.com/'//'http://www.dnd5eapi.co/api/'
 
 const OPTIONS = [{'name': 'Spells', 'url': 'spells'}, {'name': 'My Spells', 'url': 'spells'}]
 
@@ -92,8 +92,7 @@ class MainPage extends React.Component {
     fetch(this.buildRoute(OPTIONS[this.state.tab].url),{
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin':'*'
+        'Content-Type': 'application/json'
       }
     })
     .then(response => {
@@ -128,6 +127,7 @@ class MainPage extends React.Component {
   }
 
   renderMainPage() {
+    console.log(this.state.spells)
     const tabs = OPTIONS.map((option, index) => {
       if(index === this.state.tab) {
         return (
@@ -140,6 +140,7 @@ class MainPage extends React.Component {
     })
 
     const spells = this.state.spells.map(spell => {
+      console.log('rendering spell', spell)
       return (
         <SpellInfo spell={spell}/>
       )

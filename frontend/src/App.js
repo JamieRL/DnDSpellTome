@@ -1,12 +1,15 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom"
-import Header from './components/Header'
 import * as Pages from './pages'
 import styled from 'styled-components'
 
 function App() {
 
+  useEffect(() => {
+    // Update the document title using the browser API
+    //document.body.style.backgroundColor = "black";
+  });
   const Main = styled.div`
   background-color: black;
   color: white;
@@ -39,21 +42,3 @@ function App() {
 }
 
 export default App;
-
-
-/*<div className="App">
-  <header className="App-header">
-    <img src={logo} className="App-logo" alt="logo" />
-    <p>
-      Edit <code>src/App.js</code> and save to reload.
-    </p>
-    <a
-      className="App-link"
-      href="https://reactjs.org"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Learn React
-    </a>
-  </header>
-</div>*/
