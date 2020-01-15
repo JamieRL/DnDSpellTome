@@ -45,6 +45,16 @@ const TabSelected = styled.li`
   padding: 0.3rem;
   margin: 1rem;
 `
+
+const SearchButton = styled.h3`
+  color:white;
+  border: 1px solid #ffffff;
+  border-radius: 0.5px;
+  width: 20%;
+  margin:auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+`
 class MainPage extends React.Component {
 
   constructor(props) {
@@ -83,9 +93,8 @@ class MainPage extends React.Component {
   }
 
   buildRoute(type) {
-    let query = this.capitalizeWords(this.state.query.split(' ')).join('-')
-    console.log('querry', query)
-    return DND_API_URL+type+'/'+query
+    let query = this.capitalizeWords(this.state.query.split(' ')).join('+')
+    return DND_API_URL+type+'/?search='+query
   }
 
   fetchData() {
@@ -97,7 +106,16 @@ class MainPage extends React.Component {
     })
     .then(response => {
       response.json()
-      .then(json => response.ok ? this.setState({ spells: [json]}) : Promise.reject(json))
+      .then(json => {
+        if(response.ok) {
+          if(json.results.length > 0) {
+            this.setState({ spells: json.results})
+          }
+        }
+        else {
+           Promise.reject(json)
+        }
+      })
     })
   }
 
@@ -120,14 +138,13 @@ class MainPage extends React.Component {
       <>
         <form onSubmit={e => e.preventDefault()}>
           <SearchBox type='text' value={this.state.query} onChange={e => this.updateQuery(e)}/><br/>
-          <button onClick={() => this.fetchData()}>Search</button>
+          <SearchButton onClick={() => this.fetchData()}>Search</SearchButton>
         </form>
       </>
     )
   }
 
   renderMainPage() {
-    console.log(this.state.spells)
     const tabs = OPTIONS.map((option, index) => {
       if(index === this.state.tab) {
         return (
@@ -139,12 +156,13 @@ class MainPage extends React.Component {
       )
     })
 
-    const spells = this.state.spells.map(spell => {
+    const spells = this.state.spells ? this.state.spells.map(spell => {
+      console.log(this.state.spells)
       console.log('rendering spell', spell)
       return (
         <SpellInfo spell={spell}/>
       )
-    })
+    }) : null
 
     return (
       <Main>
@@ -156,7 +174,6 @@ class MainPage extends React.Component {
     )
   }
   render() {
-    console.log(this.state)
     return (
       <div>
         {this.state.loggedIn ? this.renderMainPage() : this.renderRedirect()}

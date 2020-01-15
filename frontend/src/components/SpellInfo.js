@@ -1,11 +1,23 @@
 import React from 'react'
 import styled from 'styled-components'
 
+const whiteHeart = '\u2661';
+const blackHeart = '\u2665';
+
 const Spell = styled.div`
   text-align: left;
-  margin-left: 1rem;
-  width: 80vw;
+  width: 100vw;
+  border-top: 1px solid #ffffff;
+  border-bottom: 1px solid #ffffff;
+  h3 {
+    margin-left: 1rem;
+  }
+  p {
+    margin-left: 1rem;
+  }
+
 `
+
 const FavouriteToggle = styled.p`
 
   float: right;
@@ -14,27 +26,16 @@ const FavouriteToggle = styled.p`
   border-radius: 1px;
   padding: 0.2rem;
   margin: 1rem;
-  text-align: center;
-`
-
-const FavouriteToggled = styled.p`
-
-  float: right;
-  color: black;
-  background-color: #e62212;
-  border: 1px solid #e62212;
-  border-radius: 1px;
-  padding: 0.2rem;
-  margin: 1rem;
+  width:1.2rem;
   text-align: center;
 `
 
 const Top = styled.div`
-  width: 80vw;
+  width: 100%;
   height: 2rem;
   margin-bottom: 2rem;
   h3 {
-    width: 30vw;
+    width: auto;
     float: left;
   }
 `
@@ -47,26 +48,46 @@ const FIELDS = [{label: 'Name', value:'name' }, {label:'Description', value: 'de
 
 class SpellInfo extends React.Component {
 
+  constructor(props) {
+    super(props)
+    this.state = {
+      isCollapsed: true,
+      isFavourite: false
+    }
+  }
+
+  toggleCollapsed() {
+    this.setState({isCollapsed: !this.state.isCollapsed})
+  }
+
+  toggleFavourite() {
+    console.log('toggle fav')
+    this.setState({isFavourite: !this.state.isFavourite})
+  }
+
+
+
   render() {
-    const favouriteUntoggled = (
-      <FavouriteToggle>Favourite</FavouriteToggle>
-    )
-    const favouriteToggled = (
-      <FavouriteToggled>Favourite</FavouriteToggled>
-    )
-    console.log(this.props.spell)
+
     const fields = FIELDS.map((field, index) => {
-      console.log('field', field.value)
       return <p key={index}>{field.label+': '+this.props.spell[field.value]}</p>
     })
+
+    const collapsedToggle = (
+      <h3 onClick={() => this.toggleCollapsed()}>&#8593;</h3>
+    )
+    const collapseToggle = (
+      <h3 onClick={() => this.toggleCollapsed()}>&#8595;</h3>
+    )
     return (
       <Spell>
         <Top>
-          <h3>{this.props.spell.name}</h3>
-          {this.props.isFavourite ? favouriteToggled : favouriteUntoggled }
+          <h3 onClick={() => this.toggleCollapsed()}>{this.props.spell.name}</h3>
+          <FavouriteToggle onClick={() => this.toggleFavourite()}>{this.state.isFavourite ? whiteHeart : blackHeart}</FavouriteToggle>
+          {this.state.isCollapsed ? collapsedToggle : collapseToggle}
         </Top>
 
-        {fields}
+        {this.state.isCollapsed ? null : fields}
       </Spell>
     )
   }
