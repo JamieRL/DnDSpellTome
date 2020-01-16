@@ -41,7 +41,12 @@ function login(username, password) {
     }
   })
 }
-function buildRoute(type, queryString) {
+
+function buildRoute(type, queryString, multi=false) {
+  if(multi) {
+    let query = queryString.join('%2C')
+    return DND_API_URL+type+'/?slug__in='+query
+  }
   let query = queryString.split(' ').join('+')
   return DND_API_URL+type+'/?search='+query
 }
@@ -55,7 +60,21 @@ function fetchSpellData(query) {
   })
 }
 
-function fetchFavouriteSpells(token) {
+function fetchFavouriteSpells(favourites) {
+  let query = []
+  favourites.forEach(fave => {
+    query.push(fave.slug)
+  })
+  return fetch(buildRoute('spells', query, true), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+}
+
+
+function getFavouriteSpells() {
   return fetch('/api/myspells', {
     method: 'GET',
     headers: {
@@ -65,8 +84,11 @@ function fetchFavouriteSpells(token) {
 }
 
 export {
-  fetchSpellData,
   login,
+  fetchSpellData,
+  getFavouriteSpells,
+  fetchFavouriteSpells,
   addFavourite,
-  removeFavourite
+  removeFavourite,
+
 }

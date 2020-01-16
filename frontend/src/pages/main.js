@@ -7,6 +7,7 @@ import SpellInfo from '../components/SpellInfo'
 import Header from '../components/Header'
 
 const OPTIONS = [{'name': 'Spells', 'url': 'spells'}, {'name': 'My Spells', 'url': 'spells'}]
+const FAVOURITES = 1
 
 const SearchBox = styled.input`
   text-align:center;
@@ -60,16 +61,37 @@ class MainPage extends React.Component {
       favourites: [],
       spells: []
     }
+    console.log('constructor')
+    if(this.state.tab === FAVOURITES) {
+      this.fetchFavouriteData(this.state.favourites)
+    }
   }
 
   componentWillMount() {
     this.getFavourites()
+
+  }
+
+  fetchFavouriteData(favourites) {
+    console.log('getting favourite spells data', favourites)
+    API.fetchFavouriteSpells(favourites)
+    .then(res => {
+      res.json()
+      .then(json => {
+        if(res.ok) {
+          if(json.results.length > 0) {
+              this.setState({spells: json.results})
+          }
+
+        }
+      })
+    })
   }
 
   getFavourites() {
     let token = Cookies.get('x-access-token')
     if(token) {
-      API.fetchSpellData(token)
+      API.getFavouriteSpells()
       .then(res => {
         res.json()
         .then(json => {
@@ -99,15 +121,6 @@ class MainPage extends React.Component {
     }
   }
 
-  lowercaseWords(words) {
-    let capitalizedWords = []
-    words.forEach(word => {
-      capitalizedWords.push(word.charAt().toLowerCase()+word.slice(1))
-    })
-    return capitalizedWords
-  }
-
-
   fetchData() {
     API.fetchSpellData(this.state.query)
     .then(response => {
@@ -130,7 +143,13 @@ class MainPage extends React.Component {
   }
 
   changeTab(index) {
-    this.setState({'tab': index})
+    this.setState({
+      'tab': index,
+      'spells': []
+    })
+    if(index === FAVOURITES){
+      this.fetchFavouriteData(this.state.favourites)
+    }
   }
 
   renderSearch() {
