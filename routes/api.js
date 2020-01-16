@@ -52,9 +52,12 @@ apiRouter.route('/myspells')
     }, (err) => next(err));
 })
 .delete((req,res,next) => {
-  var newFavourites = req.user.favourites.filter((fave) =>{
-    return fave.slug === req.body.slug
+  console.log('req', req.body.slug)
+  var newFavourites = req.user.favourites.filter((fave) => {
+    return fave.slug != req.body.slug
   })
+  console.log('faves', req.user.favourites);
+  console.log('newFaves', newFavourites);
   req.user.favourites = newFavourites;
   req.user.save()
   .then(user => {

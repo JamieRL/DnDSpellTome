@@ -1,14 +1,10 @@
 import React from 'react'
 import Cookies from 'js-cookie'
 import fetch from 'isomorphic-fetch'
-import {
-  Redirect
-} from "react-router-dom"
+import * as API from '../api'
 import styled from 'styled-components'
 import SpellInfo from '../components/SpellInfo'
 import Header from '../components/Header'
-
-const DND_API_URL = 'https://api.open5e.com/'//'http://www.dnd5eapi.co/api/'
 
 const OPTIONS = [{'name': 'Spells', 'url': 'spells'}, {'name': 'My Spells', 'url': 'spells'}]
 
@@ -58,9 +54,7 @@ class MainPage extends React.Component {
 
   constructor(props) {
     super(props)
-    let username = Cookies.get('username')
     this.state = {
-      loggedIn: username ? true : false,
       query: '',
       tab: 0,
       favourites: [],
@@ -69,28 +63,43 @@ class MainPage extends React.Component {
   }
 
   componentWillMount() {
+    this.getFavourites()
+  }
+
+  getFavourites() {
     let token = Cookies.get('x-access-token')
     if(token) {
-      fetch('/api/myspells', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
+      API.fetchSpellData(token)
       .then(res => {
         res.json()
         .then(json => {
-          console.log('jsonn', json)
           if(res.ok) {
             this.setState({favourites: json})
           }
         })
       })
     }
-
   }
 
-  capitalizeWords(words) {
+  toggleFavourite(spellName, spellSlug) {
+    let found = this.state.favourites.find(fave => {
+      return fave.slug === spellSlug
+    })
+    if(found) {
+      API.removeFavourite(spellName, spellSlug)
+      .then((res) => {
+        this.getFavourites()
+      })
+    }
+    else {
+      API.addFavourite(spellName, spellSlug)
+      .then(res => {
+        this.getFavourites()
+      })
+    }
+  }
+
+  lowercaseWords(words) {
     let capitalizedWords = []
     words.forEach(word => {
       capitalizedWords.push(word.charAt().toLowerCase()+word.slice(1))
@@ -98,18 +107,9 @@ class MainPage extends React.Component {
     return capitalizedWords
   }
 
-  buildRoute(type) {
-    let query = this.capitalizeWords(this.state.query.split(' ')).join('+')
-    return DND_API_URL+type+'/?search='+query
-  }
 
   fetchData() {
-    fetch(this.buildRoute(OPTIONS[this.state.tab].url),{
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+    API.fetchSpellData(this.state.query)
     .then(response => {
       response.json()
       .then(json => {
@@ -123,12 +123,6 @@ class MainPage extends React.Component {
         }
       })
     })
-  }
-
-  renderRedirect() {
-    return (
-      <Redirect to={{ pathname: "/login"}} />
-    )
   }
 
   updateQuery(e) {
@@ -150,7 +144,7 @@ class MainPage extends React.Component {
     )
   }
 
-  renderMainPage() {
+  render() {
     const tabs = OPTIONS.map((option, index) => {
       if(index === this.state.tab) {
         return (
@@ -162,12 +156,22 @@ class MainPage extends React.Component {
       )
     })
 
+    const favourites = this.state.favourites;
+
     const spells = this.state.spells ? this.state.spells.map(spell => {
-      let isFavourite = this.state.favourites.find(fave => {
-        return fave.slug === spell.slug
-      })
+      let isFavourite = false;
+      for(var i = 0; i < favourites.length; i++) {
+        if(favourites[i].slug === spell.slug){
+          isFavourite = true
+          break
+        }
+      }
       return (
-        <SpellInfo spell={spell} isFavourite={isFavourite}/>
+        <SpellInfo
+          spell={spell}
+          isFavourite={isFavourite}
+          toggleFavourite={(name, slug) => this.toggleFavourite(name, slug)}
+        />
       )
     }) : null
 
@@ -181,13 +185,6 @@ class MainPage extends React.Component {
           {spells}
         </Main>
       </>
-    )
-  }
-  render() {
-    return (
-      <div>
-        {this.renderMainPage()}
-      </div>
     )
   }
 }
