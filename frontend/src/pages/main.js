@@ -5,9 +5,8 @@ import {
   Redirect
 } from "react-router-dom"
 import styled from 'styled-components'
-
 import SpellInfo from '../components/SpellInfo'
-
+import Header from '../components/Header'
 
 const DND_API_URL = 'https://api.open5e.com/'//'http://www.dnd5eapi.co/api/'
 
@@ -64,24 +63,31 @@ class MainPage extends React.Component {
       loggedIn: username ? true : false,
       query: '',
       tab: 0,
-      favourites: {},
+      favourites: [],
       spells: []
     }
   }
 
   componentWillMount() {
-    let username = Cookies.get('username')
-    if(username) {
-      fetch('/'+username, {
+    let token = Cookies.get('x-access-token')
+    if(token) {
+      fetch('/api/myspells', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
         }
       })
-      .then(json => {
-        this.setState({'favourites': json.favourites})
+      .then(res => {
+        res.json()
+        .then(json => {
+          console.log('jsonn', json)
+          if(res.ok) {
+            this.setState({favourites: json})
+          }
+        })
       })
     }
+
   }
 
   capitalizeWords(words) {
@@ -157,26 +163,30 @@ class MainPage extends React.Component {
     })
 
     const spells = this.state.spells ? this.state.spells.map(spell => {
-      console.log(this.state.spells)
-      console.log('rendering spell', spell)
+      let isFavourite = this.state.favourites.find(fave => {
+        return fave.slug === spell.slug
+      })
       return (
-        <SpellInfo spell={spell}/>
+        <SpellInfo spell={spell} isFavourite={isFavourite}/>
       )
     }) : null
 
     return (
-      <Main>
-        <div>Main Page</div>
-        <TabList>{tabs}</TabList><br/>
-        {this.state.tab === 0 ? this.renderSearch() : null}
-        {spells}
-      </Main>
+      <>
+        <Header showLogin={true} />
+        <Main>
+          <div>Main Page</div>
+          <TabList>{tabs}</TabList><br/>
+          {this.state.tab === 0 ? this.renderSearch() : null}
+          {spells}
+        </Main>
+      </>
     )
   }
   render() {
     return (
       <div>
-        {this.state.loggedIn ? this.renderMainPage() : this.renderRedirect()}
+        {this.renderMainPage()}
       </div>
     )
   }

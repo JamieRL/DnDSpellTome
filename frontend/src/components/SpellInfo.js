@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-
+import * as API from '../api'
 const whiteHeart = '\u2661';
 const blackHeart = '\u2665';
 
@@ -52,7 +52,7 @@ class SpellInfo extends React.Component {
     super(props)
     this.state = {
       isCollapsed: true,
-      isFavourite: false
+      isFavourite: props.isFavourite
     }
   }
 
@@ -62,10 +62,21 @@ class SpellInfo extends React.Component {
 
   toggleFavourite() {
     console.log('toggle fav')
-    this.setState({isFavourite: !this.state.isFavourite})
+    let spellName = this.props.spell.name
+    let spellSlug = this.props.spell.slug
+    if(this.props.isFavourite) {
+      API.removeFavourite(spellName, spellSlug)
+      .then((res) => {
+        this.setState({isFavourite:true})
+      })
+    }
+    else {
+      API.addFavourite(spellName, spellSlug)
+      .then(res => {
+        this.setState({isFavourite:false})
+      })
+    }
   }
-
-
 
   render() {
 
@@ -83,7 +94,7 @@ class SpellInfo extends React.Component {
       <Spell>
         <Top>
           <h3 onClick={() => this.toggleCollapsed()}>{this.props.spell.name}</h3>
-          <FavouriteToggle onClick={() => this.toggleFavourite()}>{this.state.isFavourite ? whiteHeart : blackHeart}</FavouriteToggle>
+          <FavouriteToggle onClick={() => this.toggleFavourite()}>{this.state.isFavourite ? blackHeart : whiteHeart}</FavouriteToggle>
           {this.state.isCollapsed ? collapsedToggle : collapseToggle}
         </Top>
 
