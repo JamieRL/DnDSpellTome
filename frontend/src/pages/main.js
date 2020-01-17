@@ -7,7 +7,7 @@ import Header from '../components/Header'
 
 const OPTIONS = [{'name': 'Spells', 'url': 'spells'}, {'name': 'My Spells', 'url': 'spells'}]
 const FAVOURITES = 1
-
+const EMPTY = 0
 
 class MainPage extends React.Component {
 
@@ -88,6 +88,9 @@ class MainPage extends React.Component {
           if(json.results.length > 0) {
             this.setState({ spells: json.results})
           }
+          else {
+            this.setState({ spells: EMPTY})
+          }
         }
         else {
            Promise.reject(json)
@@ -128,6 +131,9 @@ class MainPage extends React.Component {
       return (
         <h3>Log in to save spells to My Spells</h3>
       )
+    }
+    if(this.state.spells === EMPTY) {
+      return <h3>No spells found</h3> 
     }
     return this.state.spells ? this.state.spells.map(spell => {
       let isFavourite = false;
