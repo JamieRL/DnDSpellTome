@@ -60,8 +60,10 @@ class MainPage extends React.Component {
       query: '',
       tab: 0,
       favourites: [],
-      spells: []
+      spells: [],
+      username: Cookies.get('username')
     }
+
     if(this.state.tab === FAVOURITES) {
       this.fetchFavouriteData(this.state.favourites)
     }
@@ -162,21 +164,15 @@ class MainPage extends React.Component {
     )
   }
 
-  render() {
-    const tabs = OPTIONS.map((option, index) => {
-      if(index === this.state.tab) {
-        return (
-          <TabSelected key={index} onClick={() => this.changeTab(index)}>{option.name}</TabSelected>
-        )
-      }
-      return (
-        <Tab key={index} onClick={() => this.changeTab(index)}>{option.name}</Tab>
-      )
-    })
-
+  renderSpells() {
     const favourites = this.state.favourites;
-
-    const spells = this.state.spells ? this.state.spells.map(spell => {
+    const loggedIn = Cookies.get('username') || false
+    if(this.state.tab === FAVOURITES && !loggedIn) {
+      return (
+        <h3>Log in to save spells to My Spells</h3>
+      )
+    }
+    return this.state.spells ? this.state.spells.map(spell => {
       let isFavourite = false;
       for(var i = 0; i < favourites.length; i++) {
         if(favourites[i].slug === spell.slug){
@@ -192,6 +188,19 @@ class MainPage extends React.Component {
         />
       )
     }) : null
+  }
+
+  render() {
+    const tabs = OPTIONS.map((option, index) => {
+      if(index === this.state.tab) {
+        return (
+          <TabSelected key={index} onClick={() => this.changeTab(index)}>{option.name}</TabSelected>
+        )
+      }
+      return (
+        <Tab key={index} onClick={() => this.changeTab(index)}>{option.name}</Tab>
+      )
+    })
 
     return (
       <>
@@ -200,7 +209,7 @@ class MainPage extends React.Component {
           <div>Main Page</div>
           <TabList>{tabs}</TabList><br/>
           {this.state.tab === 0 ? this.renderSearch() : null}
-          {spells}
+          {this.renderSpells()}
         </Main>
       </>
     )
