@@ -1,57 +1,14 @@
 import React from 'react'
 import Cookies from 'js-cookie'
-import fetch from 'isomorphic-fetch'
 import * as API from '../api'
-import styled from 'styled-components'
+import * as Components from './mainComponents'
 import SpellInfo from '../components/SpellInfo'
 import Header from '../components/Header'
 
 const OPTIONS = [{'name': 'Spells', 'url': 'spells'}, {'name': 'My Spells', 'url': 'spells'}]
 const FAVOURITES = 1
 
-const SearchBox = styled.input`
-  text-align:center;
-`
-const Main = styled.div`
-  margin-top: 10vh;
-  button {
-    margin-top: 1rem;
-  }
-`
-const TabList = styled.ul`
-  list-style-type:none;
-  display: inline;
-  margin-bottom: 1rem;
-  padding-inline-start: 0;
-`
-const Tab = styled.li`
-  display:inline-block;
-  color: #e62212;
-  border: 1px solid #e62212;
-  border-radius: 1px;
-  padding: 0.3rem;
-  margin: 1rem;
-`
 
-const TabSelected = styled.li`
-  display:inline-block;
-  color: black;
-  background-color: #e62212;
-  border: 1px solid #e62212;
-  border-radius: 1px;
-  padding: 0.3rem;
-  margin: 1rem;
-`
-
-const SearchButton = styled.h3`
-  color:white;
-  border: 1px solid #ffffff;
-  border-radius: 0.5px;
-  width: 20%;
-  margin:auto;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-`
 class MainPage extends React.Component {
 
   constructor(props) {
@@ -157,8 +114,8 @@ class MainPage extends React.Component {
     return (
       <>
         <form onSubmit={e => e.preventDefault()}>
-          <SearchBox type='text' value={this.state.query} onChange={e => this.updateQuery(e)}/><br/>
-          <SearchButton onClick={() => this.fetchData()}>Search</SearchButton>
+          <Components.SearchBox type='text' value={this.state.query} onChange={e => this.updateQuery(e)}/><br/>
+          <Components.SearchButton onClick={() => this.fetchData()}>Search</Components.SearchButton>
         </form>
       </>
     )
@@ -194,23 +151,23 @@ class MainPage extends React.Component {
     const tabs = OPTIONS.map((option, index) => {
       if(index === this.state.tab) {
         return (
-          <TabSelected key={index} onClick={() => this.changeTab(index)}>{option.name}</TabSelected>
+          <Components.TabSelected key={index} onClick={() => this.changeTab(index)}>{option.name}</Components.TabSelected>
         )
       }
       return (
-        <Tab key={index} onClick={() => this.changeTab(index)}>{option.name}</Tab>
+        <Components.Tab key={index} onClick={() => this.changeTab(index)}>{option.name}</Components.Tab>
       )
     })
 
     return (
       <>
         <Header showLogin={true} {...this.props}/>
-        <Main>
+        <Components.Main>
           <div>Main Page</div>
-          <TabList>{tabs}</TabList><br/>
+          <Components.TabList>{tabs}</Components.TabList><br/>
           {this.state.tab === 0 ? this.renderSearch() : null}
           {this.renderSpells()}
-        </Main>
+        </Components.Main>
       </>
     )
   }
