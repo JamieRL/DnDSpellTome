@@ -1,10 +1,14 @@
 import React, { useState } from 'react'
 import { useHistory } from "react-router-dom";
 import styled from 'styled-components'
+import * as API from '../api'
 import Cookies from 'js-cookie'
+import Header from '../components/Header';
+import history from '../history';
 
 const LoginInput = styled.input`
-  text-align: center;
+  text-align: left;
+  margin-bottom: 1rem;
 `
 const Login = styled.div`
   display: block;
@@ -14,23 +18,46 @@ const Login = styled.div`
   }
 `
 
+const ErrorText = styled.h3`
+  color: red;
+`
+
 function LoginPage(props) {
 
   const [username, setUsername] = useState('');
-  const history = useHistory();
+  const [password, setPassword] = useState('');
+  const [invalidCredentials, setInvalidCredentials] = useState('');
 
   function onLogin() {
-    console.log('settings username')
-    console.log(Cookies.get('username'))
-    Cookies.set('username', username)
-    history.push("/"+username);
+    setInvalidCredentials(false);
+    API.login(username, password)
+    .then((response) => {
+      if(response.ok) {
+        response.json()
+        .then(json => {
+          console.log('json', json)
+          Cookies.set('x-access-token', json.token)
+          history.push('/')
+        })
+
+      }
+      else {
+        setInvalidCredentials(true);
+      }
+    })
   }
+
   return (
-    <Login>
-      <h2>Login</h2>
-      <LoginInput type='text' value={username} onChange={e => setUsername(e.target.value)}/><br/>
-      <button onClick={onLogin}>Login</button>
-    </Login>
+    <>
+      <Header showLogin={false}/>
+      <Login>
+        <h2>Login</h2>
+        <label>Username: </label><LoginInput type='text' value={username} onChange={e => setUsername(e.target.value)}/><br/>
+        <label>Password: </label><LoginInput type='password' value={password} onChange={e => setPassword(e.target.value)}/><br/>
+        <button onClick={onLogin}>Login</button>
+        {invalidCredentials ? (<ErrorText>Invalid Username or Password</ErrorText>) : null}
+      </Login>
+    </>
   )
 }
 

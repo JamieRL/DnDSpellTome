@@ -39,7 +39,6 @@ router.route('/register')
 });
 
 router.get('/me', VerifyToken, function(req, res, next) {
-
   User.findById(req.userId, { password: 0 }, function (err, user) {
     if (err) return res.status(500).send("There was a problem finding the user.");
     if (!user) return res.status(404).send("No user found.");
@@ -50,8 +49,7 @@ router.get('/me', VerifyToken, function(req, res, next) {
 });
 
 router.post('/login', function(req, res) {
-
-  User.findOne({ email: req.body.email }, function (err, user) {
+  User.findOne({ username: req.body.username }, function (err, user) {
     if (err) return res.status(500).send('Error on the server.');
     if (!user) return res.status(404).send('No user found.');
 
@@ -62,7 +60,8 @@ router.post('/login', function(req, res) {
       expiresIn: 86400 // expires in 24 hours
     });
 
-    res.status(200).send({ auth: true, token: token });
+    res.statusCode = 200;
+    res.json({auth: true, token: token});
   });
 
 });

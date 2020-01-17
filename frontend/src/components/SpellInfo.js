@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-
 const whiteHeart = '\u2661';
 const blackHeart = '\u2665';
 
@@ -51,8 +50,7 @@ class SpellInfo extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      isCollapsed: true,
-      isFavourite: false
+      isCollapsed: true
     }
   }
 
@@ -60,15 +58,7 @@ class SpellInfo extends React.Component {
     this.setState({isCollapsed: !this.state.isCollapsed})
   }
 
-  toggleFavourite() {
-    console.log('toggle fav')
-    this.setState({isFavourite: !this.state.isFavourite})
-  }
-
-
-
   render() {
-
     const fields = FIELDS.map((field, index) => {
       return <p key={index}>{field.label+': '+this.props.spell[field.value]}</p>
     })
@@ -83,7 +73,7 @@ class SpellInfo extends React.Component {
       <Spell>
         <Top>
           <h3 onClick={() => this.toggleCollapsed()}>{this.props.spell.name}</h3>
-          <FavouriteToggle onClick={() => this.toggleFavourite()}>{this.state.isFavourite ? whiteHeart : blackHeart}</FavouriteToggle>
+          <FavouriteToggle onClick={() => this.props.toggleFavourite(this.props.spell.name, this.props.spell.slug)}>{this.props.isFavourite ? blackHeart : whiteHeart}</FavouriteToggle>
           {this.state.isCollapsed ? collapsedToggle : collapseToggle}
         </Top>
 

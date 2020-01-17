@@ -3,13 +3,14 @@ const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt-nodejs');
 
 const favouriteSchema = new Schema({
-  id: {
-    type: Number,
-    required: true
-  },
-  type: {
+  name: {
     type: String,
     required: true
+  },
+  slug: {
+    type: String,
+    required: true,
+    unique:true
   }
 }, {
   timestamps: true

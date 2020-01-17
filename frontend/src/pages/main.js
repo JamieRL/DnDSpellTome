@@ -1,17 +1,13 @@
 import React from 'react'
 import Cookies from 'js-cookie'
 import fetch from 'isomorphic-fetch'
-import {
-  Redirect
-} from "react-router-dom"
+import * as API from '../api'
 import styled from 'styled-components'
-
 import SpellInfo from '../components/SpellInfo'
-
-
-const DND_API_URL = 'https://api.open5e.com/'//'http://www.dnd5eapi.co/api/'
+import Header from '../components/Header'
 
 const OPTIONS = [{'name': 'Spells', 'url': 'spells'}, {'name': 'My Spells', 'url': 'spells'}]
+const FAVOURITES = 1
 
 const SearchBox = styled.input`
   text-align:center;
@@ -59,51 +55,74 @@ class MainPage extends React.Component {
 
   constructor(props) {
     super(props)
-    let username = Cookies.get('username')
     this.state = {
-      loggedIn: username ? true : false,
       query: '',
       tab: 0,
-      favourites: {},
+      favourites: [],
       spells: []
+    }
+    console.log('constructor')
+    if(this.state.tab === FAVOURITES) {
+      this.fetchFavouriteData(this.state.favourites)
     }
   }
 
   componentWillMount() {
-    let username = Cookies.get('username')
-    if(username) {
-      fetch('/'+username, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
+    this.getFavourites()
+
+  }
+
+  fetchFavouriteData(favourites) {
+    console.log('getting favourite spells data', favourites)
+    API.fetchFavouriteSpells(favourites)
+    .then(res => {
+      res.json()
+      .then(json => {
+        if(res.ok) {
+          if(json.results.length > 0) {
+              this.setState({spells: json.results})
+          }
+
         }
       })
-      .then(json => {
-        this.setState({'favourites': json.favourites})
+    })
+  }
+
+  getFavourites() {
+    let token = Cookies.get('x-access-token')
+    if(token) {
+      API.getFavouriteSpells()
+      .then(res => {
+        res.json()
+        .then(json => {
+          if(res.ok) {
+            this.setState({favourites: json})
+          }
+        })
       })
     }
   }
 
-  capitalizeWords(words) {
-    let capitalizedWords = []
-    words.forEach(word => {
-      capitalizedWords.push(word.charAt().toLowerCase()+word.slice(1))
+  toggleFavourite(spellName, spellSlug) {
+    let found = this.state.favourites.find(fave => {
+      return fave.slug === spellSlug
     })
-    return capitalizedWords
-  }
-
-  buildRoute(type) {
-    let query = this.capitalizeWords(this.state.query.split(' ')).join('+')
-    return DND_API_URL+type+'/?search='+query
+    if(found) {
+      API.removeFavourite(spellName, spellSlug)
+      .then((res) => {
+        this.getFavourites()
+      })
+    }
+    else {
+      API.addFavourite(spellName, spellSlug)
+      .then(res => {
+        this.getFavourites()
+      })
+    }
   }
 
   fetchData() {
-    fetch(this.buildRoute(OPTIONS[this.state.tab].url),{
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+    API.fetchSpellData(this.state.query)
     .then(response => {
       response.json()
       .then(json => {
@@ -119,18 +138,18 @@ class MainPage extends React.Component {
     })
   }
 
-  renderRedirect() {
-    return (
-      <Redirect to={{ pathname: "/login"}} />
-    )
-  }
-
   updateQuery(e) {
     this.setState({'query': e.target.value})
   }
 
   changeTab(index) {
-    this.setState({'tab': index})
+    this.setState({
+      'tab': index,
+      'spells': []
+    })
+    if(index === FAVOURITES){
+      this.fetchFavouriteData(this.state.favourites)
+    }
   }
 
   renderSearch() {
@@ -144,7 +163,7 @@ class MainPage extends React.Component {
     )
   }
 
-  renderMainPage() {
+  render() {
     const tabs = OPTIONS.map((option, index) => {
       if(index === this.state.tab) {
         return (
@@ -156,28 +175,35 @@ class MainPage extends React.Component {
       )
     })
 
+    const favourites = this.state.favourites;
+
     const spells = this.state.spells ? this.state.spells.map(spell => {
-      console.log(this.state.spells)
-      console.log('rendering spell', spell)
+      let isFavourite = false;
+      for(var i = 0; i < favourites.length; i++) {
+        if(favourites[i].slug === spell.slug){
+          isFavourite = true
+          break
+        }
+      }
       return (
-        <SpellInfo spell={spell}/>
+        <SpellInfo
+          spell={spell}
+          isFavourite={isFavourite}
+          toggleFavourite={(name, slug) => this.toggleFavourite(name, slug)}
+        />
       )
     }) : null
 
     return (
-      <Main>
-        <div>Main Page</div>
-        <TabList>{tabs}</TabList><br/>
-        {this.state.tab === 0 ? this.renderSearch() : null}
-        {spells}
-      </Main>
-    )
-  }
-  render() {
-    return (
-      <div>
-        {this.state.loggedIn ? this.renderMainPage() : this.renderRedirect()}
-      </div>
+      <>
+        <Header showLogin={true} />
+        <Main>
+          <div>Main Page</div>
+          <TabList>{tabs}</TabList><br/>
+          {this.state.tab === 0 ? this.renderSearch() : null}
+          {spells}
+        </Main>
+      </>
     )
   }
 }
