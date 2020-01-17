@@ -13,6 +13,7 @@ const SearchBox = styled.input`
   text-align:center;
 `
 const Main = styled.div`
+  margin-top: 10vh;
   button {
     margin-top: 1rem;
   }
@@ -61,7 +62,6 @@ class MainPage extends React.Component {
       favourites: [],
       spells: []
     }
-    console.log('constructor')
     if(this.state.tab === FAVOURITES) {
       this.fetchFavouriteData(this.state.favourites)
     }
@@ -73,7 +73,6 @@ class MainPage extends React.Component {
   }
 
   fetchFavouriteData(favourites) {
-    console.log('getting favourite spells data', favourites)
     API.fetchFavouriteSpells(favourites)
     .then(res => {
       res.json()
@@ -196,7 +195,7 @@ class MainPage extends React.Component {
 
     return (
       <>
-        <Header showLogin={true} />
+        <Header showLogin={true} {...this.props}/>
         <Main>
           <div>Main Page</div>
           <TabList>{tabs}</TabList><br/>

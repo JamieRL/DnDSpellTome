@@ -19,8 +19,8 @@ function App() {
 
         <Router history={history}>
           <Switch>
-            <Route path="/login" component={Pages.Login}/>
-            <Route path="/" component={Pages.Main}/>
+            <Route path="/login" component={Pages.Login} history={history}/>
+            <Route path="/" component={Pages.Main} history={history}/>
           </Switch>
         </Router>
 

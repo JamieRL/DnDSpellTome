@@ -35,8 +35,8 @@ function LoginPage(props) {
       if(response.ok) {
         response.json()
         .then(json => {
-          console.log('json', json)
           Cookies.set('x-access-token', json.token)
+          Cookies.set('username', json.username)
           history.push('/')
         })
 
@@ -49,7 +49,7 @@ function LoginPage(props) {
 
   return (
     <>
-      <Header showLogin={false}/>
+      <Header showLogin={false} {...props}/>
       <Login>
         <h2>Login</h2>
         <label>Username: </label><LoginInput type='text' value={username} onChange={e => setUsername(e.target.value)}/><br/>

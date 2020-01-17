@@ -61,7 +61,7 @@ router.post('/login', function(req, res) {
     });
 
     res.statusCode = 200;
-    res.json({auth: true, token: token});
+    res.json({username: user.username, token: token});
   });
 
 });
