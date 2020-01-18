@@ -26,7 +26,14 @@ router.route('/register')
       password : hashedPassword
     },
     function (err, user) {
-      if (err) return res.status(500).send("There was a problem registering the user.")
+      if (err)
+      {
+        console.log('err', err)
+        if(err.name === 'ValidationError') {
+          return res.status(400).json({ error: 'Invalid Username' });
+        }
+        return res.status(400).json({ error: 'User with username '+req.body.username+' already exists'})
+      }
       // create a token
       var token = jwt.sign({ id: user._id }, process.env.SECRET, {
         expiresIn: 86400 // expires in 24 hours

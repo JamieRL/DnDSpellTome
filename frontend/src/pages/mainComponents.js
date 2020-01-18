@@ -4,7 +4,7 @@ const SearchBox = styled.input`
   text-align:center;
 `
 const Main = styled.div`
-  margin-top: 10vh;
+  margin-top: 15vh;
   button {
     margin-top: 1rem;
   }

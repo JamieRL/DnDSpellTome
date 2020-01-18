@@ -43,7 +43,10 @@ function RegistrationPage(props) {
         })
       }
       else {
-        setErrors(response.statusText)
+        response.json()
+        .then(json => {
+          setErrors(json.error)
+        })
       }
     })
 

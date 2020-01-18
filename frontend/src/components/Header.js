@@ -1,22 +1,21 @@
 import React from 'react'
 import styled from 'styled-components'
 import Cookies from 'js-cookie'
-const Header = styled.h1`
+const Header = styled.div`
   color: #e62212;
   width: 100%;
   font-family: Copperplate-Bold;
-  padding-top:3rem;
   margin-top: 0;
   height: 3rem;
   z-index: 5;
   background-color: black;
   position:absolute;
   top:0;
+  padding-top:3vh;
   left:0;
   right:0;
-  height:0rem;
-  span{
-    font-size: 7.5vw;
+  font-size:110%;
+  h2{
     position:absolute;
     width:100%;
     top:0;
@@ -26,12 +25,11 @@ const Header = styled.h1`
   }
   a,p {
     position:absolute;
-    top: 2%;
+    top: 0;
     right:0;
     color: #e62212;
     width: 20%
     float:right;
-    font-size: 4vw;
     margin-top:0.4rem;
     text-decoration:none !important;
   }
@@ -46,15 +44,19 @@ function HeaderComponent(props) {
     window.location.reload()
   }
 
+  function goHome() {
+    props.history.push('/')
+  }
+
   const token = Cookies.get('x-access-token')
 
-  const login = <a href='/login'>Login</a>
+  const login = <p><a href='/login'>Login</a></p>
   const logout = <p onClick={() => onLogout()}>Logout</p>
 
   return (
     <Header>
 
-      <span>5e Spell-Tome</span>
+      <h2 onClick={() => goHome()}>5e Spell-Tome</h2>
       {props.showLogin ? (token ? logout : login) : null}
     </Header>
   )

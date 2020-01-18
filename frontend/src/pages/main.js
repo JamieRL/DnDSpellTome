@@ -19,7 +19,8 @@ class MainPage extends React.Component {
       tab: 0,
       favourites: [],
       spells: [],
-      username: Cookies.get('username')
+      username: Cookies.get('username'),
+      isLoading: false
     }
 
     if(this.state.tab === FAVOURITES) {
@@ -59,7 +60,7 @@ class MainPage extends React.Component {
         res.json()
         .then(json => {
           if(res.ok) {
-            this.setState({favourites: json})
+            this.setState({favourites: json, isLoading: false})
           }
         })
       })
@@ -67,9 +68,18 @@ class MainPage extends React.Component {
   }
 
   toggleFavourite(spellName, spellSlug) {
+    if(this.state.isLoading) {
+      return
+    }
+    let token = Cookies.get('x-access-token')
+    if(!token) {
+      window.alert('Sign in to save to My Spells')
+      return
+    }
     let found = this.state.favourites.find(fave => {
       return fave.slug === spellSlug
     })
+    this.setState({isLoading: true})
     if(found) {
       API.removeFavourite(spellName, spellSlug)
       .then((res) => {
@@ -156,6 +166,7 @@ class MainPage extends React.Component {
           spell={spell}
           isFavourite={isFavourite}
           toggleFavourite={(name, slug) => this.toggleFavourite(name, slug)}
+          isLoading={this.state.isLoading}
         />
       )
     }) : null
@@ -177,7 +188,6 @@ class MainPage extends React.Component {
       <>
         <Header showLogin={true} {...this.props}/>
         <Components.Main>
-          <div>Main Page</div>
           <Components.TabList>{tabs}</Components.TabList><br/>
           {this.state.tab === 0 ? this.renderSearch() : null}
           {this.renderSpells()}

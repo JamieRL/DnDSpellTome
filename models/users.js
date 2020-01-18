@@ -19,7 +19,10 @@ const favouriteSchema = new Schema({
 const userSchema = new Schema({
   username: {
     type: String,
-    required: true,
+    required: [true, "can't be blank"],
+    match: [/^[a-zA-Z0-9]+$/, 'is invalid'],
+    index: true,
+    lowercase: true,
     unique: true
   },
   password: {
