@@ -8,9 +8,7 @@ import Header from '../components/Header'
 const OPTIONS = [{'name': 'Spells', 'url': 'spells'}, {'name': 'My Spells', 'url': 'spells'}]
 const FAVOURITES = 1
 const EMPTY = 0
-const whiteHeart = '\u2661';
 const blackHeart = '\u2665';
-
 
 class MainPage extends React.Component {
 

@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useHistory } from "react-router-dom";
 import styled from 'styled-components'
 import * as API from '../api'
 import Cookies from 'js-cookie'
@@ -52,7 +51,7 @@ function LoginPage(props) {
       <Header showLogin={false} {...props}/>
       <Login>
         <h2>Login</h2>
-        <label>Username: </label><LoginInput type='text' value={username} onChange={e => setUsername(e.target.value)}/><br/>
+        <label>Username: </label><LoginInput type='email' value={username} onChange={e => setUsername(e.target.value)}/><br/>
         <label>Password: </label><LoginInput type='password' value={password} onChange={e => setPassword(e.target.value)}/><br/>
         <button onClick={onLogin}>Login</button>
         {invalidCredentials ? (<ErrorText>Invalid Username or Password</ErrorText>) : null}
