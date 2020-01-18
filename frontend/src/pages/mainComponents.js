@@ -8,6 +8,13 @@ const Main = styled.div`
   button {
     margin-top: 1rem;
   }
+  .heart {
+    color: #e62212;
+  }
+  .noFavourites {
+    width: 65vw;
+    margin: auto;
+  }
 `
 const TabList = styled.ul`
   list-style-type:none;

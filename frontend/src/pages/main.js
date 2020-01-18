@@ -8,6 +8,9 @@ import Header from '../components/Header'
 const OPTIONS = [{'name': 'Spells', 'url': 'spells'}, {'name': 'My Spells', 'url': 'spells'}]
 const FAVOURITES = 1
 const EMPTY = 0
+const whiteHeart = '\u2661';
+const blackHeart = '\u2665';
+
 
 class MainPage extends React.Component {
 
@@ -32,6 +35,10 @@ class MainPage extends React.Component {
   }
 
   fetchFavouriteData(favourites) {
+    if(favourites.length < 1) {
+      this.setState({spells: EMPTY})
+      return
+    }
     API.fetchFavouriteSpells(favourites)
     .then(res => {
       res.json()
@@ -133,7 +140,10 @@ class MainPage extends React.Component {
       )
     }
     if(this.state.spells === EMPTY) {
-      return <h3>No spells found</h3> 
+      if(this.state.tab === FAVOURITES) {
+        return <h3 className='noFavourites'>Add spells to <span className='heart'>{blackHeart+' '}</span>My Spells to save them here</h3>
+      }
+      return <h3>No spells found</h3>
     }
     return this.state.spells ? this.state.spells.map(spell => {
       let isFavourite = false;
