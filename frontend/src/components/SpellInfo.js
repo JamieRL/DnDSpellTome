@@ -8,6 +8,8 @@ const Spell = styled.div`
   width: 100vw;
   border-top: 1px solid #ffffff;
   border-bottom: 1px solid #ffffff;
+  padding-top:1rem;
+  padding-bottom: 1rem;
   h3 {
     margin-left: 1rem;
   }
@@ -32,10 +34,25 @@ const FavouriteToggle = styled.p`
 const Top = styled.div`
   width: 100%;
   height: 2rem;
-  margin-bottom: 2rem;
+  div {
+    width: 85%;
+    display:inline-block;
+  }
   h3 {
     width: auto;
     float: left;
+    margin:0;
+    margin-left:1rem;
+
+  }
+  .toggle {
+    width:10%;
+    margin: 0;
+    margin-left: 1rem;
+  }
+  p {
+    margin:0;
+    margin-right: 1rem;
   }
 `
 
@@ -64,17 +81,20 @@ class SpellInfo extends React.Component {
     })
 
     const collapsedToggle = (
-      <h3 onClick={() => this.toggleCollapsed()}>&#8593;</h3>
+      <h3 className="toggle" >&#8593;</h3>
     )
     const collapseToggle = (
-      <h3 onClick={() => this.toggleCollapsed()}>&#8595;</h3>
+      <h3 className="toggle" >&#8595;</h3>
     )
     return (
       <Spell>
         <Top>
-          <h3 onClick={() => this.toggleCollapsed()}>{this.props.spell.name}</h3>
+          <div onClick={() => this.toggleCollapsed()}>
+            <h3 >{this.props.spell.name}</h3>
+            {this.state.isCollapsed ? collapsedToggle : collapseToggle}
+          </div>
           <FavouriteToggle onClick={() => this.props.toggleFavourite(this.props.spell.name, this.props.spell.slug)}>{this.props.isFavourite ? blackHeart : whiteHeart}</FavouriteToggle>
-          {this.state.isCollapsed ? collapsedToggle : collapseToggle}
+
         </Top>
 
         {this.state.isCollapsed ? null : fields}
