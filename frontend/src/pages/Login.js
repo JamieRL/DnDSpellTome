@@ -15,6 +15,10 @@ const Login = styled.div`
     margin: 1rem;
     background-color:white;
   }
+  a {
+    text-decoration: none !important;
+    color: #e62212;
+  }
 `
 
 const ErrorText = styled.h3`
@@ -51,6 +55,7 @@ function LoginPage(props) {
       <Header showLogin={false} {...props}/>
       <Login>
         <h2>Login</h2>
+        <h3>Don't have an account? <a href='/register'>Sign Up</a></h3>
         <label>Username: </label><LoginInput type='email' value={username} onChange={e => setUsername(e.target.value)}/><br/>
         <label>Password: </label><LoginInput type='password' value={password} onChange={e => setPassword(e.target.value)}/><br/>
         <button onClick={onLogin}>Login</button>

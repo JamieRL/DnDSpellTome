@@ -33,7 +33,7 @@ router.route('/register')
       });
       // res.status(200).json({ auth: true, token: token });
       res.statusCode = 200;
-      res.json({auth: true, token: token});
+      res.json({username: user.username, token: token});
     });
   }
 });

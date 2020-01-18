@@ -42,6 +42,20 @@ function login(username, password) {
   })
 }
 
+function register(username, password, confirmPassword) {
+  return fetch('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({
+      username: username,
+      password: password,
+      confirmPassword: confirmPassword
+    }),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+}
+
 function buildRoute(type, queryString, multi=false) {
   if(multi) {
     let query = queryString.join('%2C')
@@ -85,10 +99,10 @@ function getFavouriteSpells() {
 
 export {
   login,
+  register,
   fetchSpellData,
   getFavouriteSpells,
   fetchFavouriteSpells,
   addFavourite,
-  removeFavourite,
-
+  removeFavourite
 }
