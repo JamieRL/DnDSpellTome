@@ -26,14 +26,21 @@ router.route('/register')
       password : hashedPassword
     },
     function (err, user) {
-      if (err) return res.status(500).send("There was a problem registering the user.")
+      if (err)
+      {
+        console.log('err', err)
+        if(err.name === 'ValidationError') {
+          return res.status(400).json({ error: 'Invalid Username' });
+        }
+        return res.status(400).json({ error: 'User with username '+req.body.username+' already exists'})
+      }
       // create a token
       var token = jwt.sign({ id: user._id }, process.env.SECRET, {
         expiresIn: 86400 // expires in 24 hours
       });
       // res.status(200).json({ auth: true, token: token });
       res.statusCode = 200;
-      res.json({auth: true, token: token});
+      res.json({username: user.username, token: token});
     });
   }
 });
@@ -61,7 +68,7 @@ router.post('/login', function(req, res) {
     });
 
     res.statusCode = 200;
-    res.json({auth: true, token: token});
+    res.json({username: user.username, token: token});
   });
 
 });

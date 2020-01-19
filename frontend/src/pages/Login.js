@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useHistory } from "react-router-dom";
 import styled from 'styled-components'
 import * as API from '../api'
 import Cookies from 'js-cookie'
@@ -15,6 +14,10 @@ const Login = styled.div`
   button{
     margin: 1rem;
     background-color:white;
+  }
+  a {
+    text-decoration: none !important;
+    color: #e62212;
   }
 `
 
@@ -35,8 +38,8 @@ function LoginPage(props) {
       if(response.ok) {
         response.json()
         .then(json => {
-          console.log('json', json)
           Cookies.set('x-access-token', json.token)
+          Cookies.set('username', json.username)
           history.push('/')
         })
 
@@ -49,10 +52,11 @@ function LoginPage(props) {
 
   return (
     <>
-      <Header showLogin={false}/>
+      <Header showLogin={false} {...props}/>
       <Login>
         <h2>Login</h2>
-        <label>Username: </label><LoginInput type='text' value={username} onChange={e => setUsername(e.target.value)}/><br/>
+        <h3>Don't have an account? <a href='/register'>Sign Up</a></h3>
+        <label>Username: </label><LoginInput type='email' value={username} onChange={e => setUsername(e.target.value)}/><br/>
         <label>Password: </label><LoginInput type='password' value={password} onChange={e => setPassword(e.target.value)}/><br/>
         <button onClick={onLogin}>Login</button>
         {invalidCredentials ? (<ErrorText>Invalid Username or Password</ErrorText>) : null}

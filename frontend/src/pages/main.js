@@ -1,56 +1,15 @@
 import React from 'react'
 import Cookies from 'js-cookie'
-import fetch from 'isomorphic-fetch'
 import * as API from '../api'
-import styled from 'styled-components'
+import * as Components from './mainComponents'
 import SpellInfo from '../components/SpellInfo'
 import Header from '../components/Header'
 
 const OPTIONS = [{'name': 'Spells', 'url': 'spells'}, {'name': 'My Spells', 'url': 'spells'}]
 const FAVOURITES = 1
+const EMPTY = 0
+const blackHeart = '\u2665';
 
-const SearchBox = styled.input`
-  text-align:center;
-`
-const Main = styled.div`
-  button {
-    margin-top: 1rem;
-  }
-`
-const TabList = styled.ul`
-  list-style-type:none;
-  display: inline;
-  margin-bottom: 1rem;
-  padding-inline-start: 0;
-`
-const Tab = styled.li`
-  display:inline-block;
-  color: #e62212;
-  border: 1px solid #e62212;
-  border-radius: 1px;
-  padding: 0.3rem;
-  margin: 1rem;
-`
-
-const TabSelected = styled.li`
-  display:inline-block;
-  color: black;
-  background-color: #e62212;
-  border: 1px solid #e62212;
-  border-radius: 1px;
-  padding: 0.3rem;
-  margin: 1rem;
-`
-
-const SearchButton = styled.h3`
-  color:white;
-  border: 1px solid #ffffff;
-  border-radius: 0.5px;
-  width: 20%;
-  margin:auto;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-`
 class MainPage extends React.Component {
 
   constructor(props) {
@@ -59,9 +18,11 @@ class MainPage extends React.Component {
       query: '',
       tab: 0,
       favourites: [],
-      spells: []
+      spells: [],
+      username: Cookies.get('username'),
+      isLoading: false
     }
-    console.log('constructor')
+
     if(this.state.tab === FAVOURITES) {
       this.fetchFavouriteData(this.state.favourites)
     }
@@ -73,7 +34,10 @@ class MainPage extends React.Component {
   }
 
   fetchFavouriteData(favourites) {
-    console.log('getting favourite spells data', favourites)
+    if(favourites.length < 1) {
+      this.setState({spells: EMPTY})
+      return
+    }
     API.fetchFavouriteSpells(favourites)
     .then(res => {
       res.json()
@@ -96,7 +60,7 @@ class MainPage extends React.Component {
         res.json()
         .then(json => {
           if(res.ok) {
-            this.setState({favourites: json})
+            this.setState({favourites: json, isLoading: false})
           }
         })
       })
@@ -104,9 +68,18 @@ class MainPage extends React.Component {
   }
 
   toggleFavourite(spellName, spellSlug) {
+    if(this.state.isLoading) {
+      return
+    }
+    let token = Cookies.get('x-access-token')
+    if(!token) {
+      window.alert('Sign in to save to My Spells')
+      return
+    }
     let found = this.state.favourites.find(fave => {
       return fave.slug === spellSlug
     })
+    this.setState({isLoading: true})
     if(found) {
       API.removeFavourite(spellName, spellSlug)
       .then((res) => {
@@ -129,6 +102,9 @@ class MainPage extends React.Component {
         if(response.ok) {
           if(json.results.length > 0) {
             this.setState({ spells: json.results})
+          }
+          else {
+            this.setState({ spells: EMPTY})
           }
         }
         else {
@@ -156,28 +132,28 @@ class MainPage extends React.Component {
     return (
       <>
         <form onSubmit={e => e.preventDefault()}>
-          <SearchBox type='text' value={this.state.query} onChange={e => this.updateQuery(e)}/><br/>
-          <SearchButton onClick={() => this.fetchData()}>Search</SearchButton>
+          <Components.SearchBox type='text' value={this.state.query} onChange={e => this.updateQuery(e)}/><br/>
+          <Components.SearchButton onClick={() => this.fetchData()}>Search</Components.SearchButton>
         </form>
       </>
     )
   }
 
-  render() {
-    const tabs = OPTIONS.map((option, index) => {
-      if(index === this.state.tab) {
-        return (
-          <TabSelected key={index} onClick={() => this.changeTab(index)}>{option.name}</TabSelected>
-        )
-      }
-      return (
-        <Tab key={index} onClick={() => this.changeTab(index)}>{option.name}</Tab>
-      )
-    })
-
+  renderSpells() {
     const favourites = this.state.favourites;
-
-    const spells = this.state.spells ? this.state.spells.map(spell => {
+    const loggedIn = Cookies.get('username') || false
+    if(this.state.tab === FAVOURITES && !loggedIn) {
+      return (
+        <h3>Log in to save spells to My Spells</h3>
+      )
+    }
+    if(this.state.spells === EMPTY) {
+      if(this.state.tab === FAVOURITES) {
+        return <h3 className='noFavourites'>Add spells to <span className='heart'>{blackHeart+' '}</span>My Spells to save them here</h3>
+      }
+      return <h3>No spells found</h3>
+    }
+    return this.state.spells ? this.state.spells.map(spell => {
       let isFavourite = false;
       for(var i = 0; i < favourites.length; i++) {
         if(favourites[i].slug === spell.slug){
@@ -190,19 +166,32 @@ class MainPage extends React.Component {
           spell={spell}
           isFavourite={isFavourite}
           toggleFavourite={(name, slug) => this.toggleFavourite(name, slug)}
+          isLoading={this.state.isLoading}
         />
       )
     }) : null
+  }
+
+  render() {
+    const tabs = OPTIONS.map((option, index) => {
+      if(index === this.state.tab) {
+        return (
+          <Components.TabSelected key={index} onClick={() => this.changeTab(index)}>{option.name}</Components.TabSelected>
+        )
+      }
+      return (
+        <Components.Tab key={index} onClick={() => this.changeTab(index)}>{option.name}</Components.Tab>
+      )
+    })
 
     return (
       <>
-        <Header showLogin={true} />
-        <Main>
-          <div>Main Page</div>
-          <TabList>{tabs}</TabList><br/>
+        <Header showLogin={true} {...this.props}/>
+        <Components.Main>
+          <Components.TabList>{tabs}</Components.TabList><br/>
           {this.state.tab === 0 ? this.renderSearch() : null}
-          {spells}
-        </Main>
+          {this.renderSpells()}
+        </Components.Main>
       </>
     )
   }

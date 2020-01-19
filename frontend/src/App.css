@@ -5,8 +5,13 @@ body {
   color: white;
   height: 100vh;
   text-align:center;
-  font-size: 1rem;
+  font-size: 1rem !important;
   letter-spacing: 0.5px;
+}
+
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 
