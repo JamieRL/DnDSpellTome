@@ -1,9 +1,11 @@
 {
   "name": "dndspelltome",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "author": "Jamie Lee",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "heroku-postbuild": "cd client && npm install && npm run build"
   },
   "dependencies": {
     "bcrypt": "^3.0.7",
