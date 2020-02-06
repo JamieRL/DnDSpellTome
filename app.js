@@ -12,8 +12,10 @@ var VerifyToken = require('./auth/VerifyToken');
 
 var app = express();
 
-const url = 'mongodb://localhost:27017/spelltome';
-const connect = mongoose.connect(url)
+//const url = 'mongodb://localhost:27017/spelltome';
+const url = 'mongodb+srv://'+process.env.DB_USER+':'+process.env.DB_PASSWORD+'@cluster0-yqzrv.gcp.mongodb.net/spelltome?retryWrites=true&w=majority';
+console.log('url', url)
+const connect = mongoose.connect(url, { useNewUrlParser: true });
 connect.then((db) => {
   console.log('Connected to database server');
 }, (err) => {
@@ -29,10 +31,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser('CNMEjlwzFZOoEynNekFyhQ=='));
 
-app.use('/auth', AuthController);
 app.use(express.static(path.join(__dirname, 'frontend/build')));
+//Routes
+app.use('/auth', AuthController);
 app.use('/api', VerifyToken, apiRouter);
-app.get('*', function(req,res,next){
+app.get('/*', function(req,res,next){
     res.sendFile(path.join(__dirname+'/frontend/build/index.html'));
 });
 
